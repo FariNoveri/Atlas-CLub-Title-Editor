@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Title Editor Pro — Atlas Club</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d13;--panel:#111318;--card:#181b24;--card2:#1d2030;
+  --border:#252839;--border2:#2e3248;
+  --accent:#3b82f6;--accent2:#60a5fa;
+  --text:#dde3f0;--muted:#5a6080;--muted2:#7a84a8;
+  --green:#22c55e;--yellow:#eab308;--red:#ef4444;--gold:#FFA500;
+}
+body{
+  background:#060810;color:var(--text);font-family:'Exo 2',sans-serif;
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+  background-image:radial-gradient(ellipse at 15% 50%,rgba(59,130,246,.05) 0%,transparent 55%),
+                   radial-gradient(ellipse at 85% 20%,rgba(139,92,246,.04) 0%,transparent 45%);
+}
+.window{
+  background:var(--bg);border:1px solid var(--border);border-radius:14px;
+  width:100%;max-width:980px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.03),0 30px 70px rgba(0,0,0,.75),0 0 80px rgba(59,130,246,.07);
+  overflow:hidden;
+}
+
+/* TITLEBAR */
+.titlebar{background:var(--panel);border-bottom:1px solid var(--border);padding:10px 18px;display:flex;align-items:center;justify-content:space-between}
+.tb-l{display:flex;align-items:center;gap:11px}
+.tb-icon{width:35px;height:35px;background:linear-gradient(135deg,#3b82f6,#2563eb);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 2px 10px rgba(59,130,246,.45)}
+.tb-name{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700}
+.tb-sub{font-size:10px;color:var(--muted2);margin-top:1px}
+.tb-by{font-size:9.5px;color:#4a5278;margin-top:1px}
+.tb-close{width:33px;height:33px;background:var(--red);border:none;border-radius:8px;color:#fff;font-size:14px;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;font-weight:700}
+.tb-close:hover{background:#dc2626;transform:scale(1.08)}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:235px 1fr;height:calc(100vh - 120px);max-height:860px}
+
+/* LEFT */
+.left{background:var(--panel);border-right:1px solid var(--border);padding:15px 14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+.ph{display:flex;align-items:center;justify-content:space-between}
+.ph-title{font-family:'Rajdhani',sans-serif;font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:6px}
+.rbtn{background:transparent;border:1px solid var(--border2);color:var(--accent2);padding:3px 8px;border-radius:6px;font-size:10.5px;cursor:pointer;font-family:'Exo 2',sans-serif;transition:.14s}
+.rbtn:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* ADD USER SECTION */
+.add-user-box{background:var(--card);border:1px solid var(--border2);border-radius:9px;padding:10px 11px}
+.add-user-title{font-size:11px;color:var(--muted2);margin-bottom:8px;font-weight:600;letter-spacing:.5px}
+.add-user-inp{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:12px;outline:none;transition:.13s;margin-bottom:6px}
+.add-user-inp:focus{border-color:var(--accent)}
+.add-user-inp::placeholder{color:var(--muted)}
+.add-user-btn{width:100%;padding:7px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:.13s}
+.add-user-btn:hover{background:#2563eb}
+
+.sep-label{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:4px 0 2px;border-top:1px solid var(--border);margin-top:2px}
+
+.sw{position:relative}
+.sw input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 10px 7px 28px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:12px;outline:none;transition:.14s}
+.sw input:focus{border-color:var(--accent)}
+.sw input::placeholder{color:var(--muted)}
+.si{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);pointer-events:none}
+.plist{flex:1;display:flex;flex-direction:column;gap:3px}
+.pitem{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 9px;cursor:pointer;transition:.14s;display:flex;align-items:center;gap:8px}
+.pitem:hover{border-color:var(--border2);background:var(--card2)}
+.pitem.on{border-color:var(--accent);background:rgba(59,130,246,.1)}
+.pitem.locked{opacity:.45;cursor:not-allowed}
+.pitem.locked:hover{border-color:var(--border);background:var(--card)}
+.pavatar{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.pinfo{min-width:0;flex:1}
+.pdisp{font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
+.puser{font-size:10px;color:var(--muted2)}
+.pbadge{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;flex-shrink:0}
+.badge-admin{background:rgba(239,68,68,.2);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+.badge-mod{background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
+.badge-builder{background:rgba(234,179,8,.2);color:#fbbf24;border:1px solid rgba(234,179,8,.3)}
+.badge-dj{background:rgba(168,85,247,.2);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
+.badge-security{background:rgba(34,197,94,.2);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.badge-soon{background:rgba(100,116,139,.15);color:var(--muted2);border:1px solid var(--border);font-style:italic}
+.badge-you{background:rgba(16,185,129,.2);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.lock-icon{font-size:9px;color:var(--muted);margin-left:auto;flex-shrink:0}
+
+/* RIGHT */
+.right{overflow-y:auto;padding:16px 18px}
+.sel-badge{background:linear-gradient(135deg,rgba(30,58,95,.85),rgba(20,38,68,.9));border:1px solid rgba(59,130,246,.35);border-radius:10px;padding:10px 18px;text-align:center;margin-bottom:15px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600}
+.sel-badge .dn{color:var(--gold);margin-right:4px}
+#selLabel{color:var(--accent2)}
+
+/* DISABLED SECTION */
+.sec-disabled{opacity:.35;pointer-events:none;position:relative}
+.sec-disabled-overlay{position:absolute;inset:0;z-index:10;cursor:not-allowed;background:rgba(11,13,19,.3);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.disabled-badge{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:6px 14px;font-size:11px;color:#f87171;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.5px}
+
+.sec{margin-bottom:18px;position:relative}
+.sec-title{font-family:'Rajdhani',sans-serif;font-size:12.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.flabel{font-size:11px;color:var(--muted2);margin-bottom:5px;display:flex;align-items:center;gap:4px}
+.inp{width:100%;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:12.5px;outline:none;transition:.14s;margin-bottom:9px}
+.inp:focus{border-color:var(--accent);background:var(--card2)}
+.inp::placeholder{color:var(--muted)}
+
+/* ANIM */
+.agrid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:9px}
+.abtn{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:7px 4px 5px;cursor:pointer;transition:.14s;text-align:center;color:var(--muted);font-family:'Exo 2',sans-serif;font-size:10px}
+.abtn .aico{font-size:17px;display:block;margin-bottom:2px}
+.abtn:hover{border-color:var(--border2);color:var(--text)}
+.abtn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* SPEED */
+.sprow{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.sprow label{font-size:10.5px;color:var(--muted);white-space:nowrap;flex-shrink:0}
+.spslider{flex:1;-webkit-appearance:none;height:4px;background:var(--border2);border-radius:2px;outline:none;cursor:pointer}
+.spslider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 0 6px rgba(59,130,246,.55)}
+.spval{font-size:11px;font-weight:600;color:var(--accent2);min-width:32px;text-align:right}
+
+/* COLOR */
+.color-wrap.hidden{display:none}
+.cerr{font-size:10.5px;color:var(--red);margin-bottom:6px;display:none}
+.cerr.show{display:block}
+.color-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.ctag{display:flex;align-items:center;gap:5px;background:var(--card2);border:1px solid var(--border2);border-radius:6px;padding:3px 7px 3px 5px;font-size:11px}
+.ctag-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.ctag-del{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;padding:0;line-height:1;transition:.1s;margin-left:2px}
+.ctag-del:hover{color:var(--red)}
+.add-color-btn{width:100%;padding:6px;background:transparent;border:1px dashed var(--border2);border-radius:7px;color:var(--muted2);font-family:'Exo 2',sans-serif;font-size:11px;cursor:pointer;transition:.14s;margin-bottom:8px}
+.add-color-btn:hover{border-color:var(--accent);color:var(--accent2)}
+
+/* COLOR PICKER */
+.cpicker{background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:12px;margin-bottom:9px}
+.cpicker-top{display:flex;gap:10px;margin-bottom:10px}
+.hue-box{position:relative;width:100%;height:130px;border-radius:7px;cursor:crosshair;overflow:hidden;background:linear-gradient(to bottom,rgba(0,0,0,0),rgba(0,0,0,1)),linear-gradient(to right,#fff,#ff0000)}
+.hue-cursor{position:absolute;width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 3px rgba(0,0,0,.8);pointer-events:none;transform:translate(-50%,-50%);top:0;left:100%}
+.hue-strip-wrap{width:16px;flex-shrink:0}
+.hue-strip{width:16px;height:130px;border-radius:4px;cursor:pointer;position:relative;background:linear-gradient(to bottom,#ff0000,#ff8000,#ffff00,#80ff00,#00ff00,#00ff80,#00ffff,#0080ff,#0000ff,#8000ff,#ff00ff,#ff0000)}
+.hue-strip-cursor{position:absolute;left:-3px;right:-3px;height:3px;background:#fff;border-radius:2px;box-shadow:0 0 3px rgba(0,0,0,.8);pointer-events:none;top:0}
+.cpicker-preview-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.cpicker-preview-box{width:34px;height:34px;border-radius:7px;border:1px solid var(--border2);flex-shrink:0}
+.cpicker-hex-wrap{flex:1}
+.cpicker-hex-wrap label{font-size:9.5px;color:var(--muted2);display:block;margin-bottom:3px}
+.cpicker-hex-wrap input{width:100%;background:var(--card2);border:1px solid var(--border2);border-radius:5px;padding:5px 8px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:11.5px;outline:none}
+.cpicker-rgb{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:8px}
+.cpicker-rgb-item label{font-size:9.5px;color:var(--muted2);display:block;margin-bottom:3px}
+.cpicker-rgb-item input{width:100%;background:var(--card2);border:1px solid var(--border2);border-radius:5px;padding:5px 6px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:11px;outline:none}
+.swatches{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.swatch{width:18px;height:18px;border-radius:4px;cursor:pointer;transition:.12s;border:1px solid rgba(255,255,255,.08)}
+.swatch:hover{transform:scale(1.25);border-color:rgba(255,255,255,.4)}
+
+.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
+
+/* PREVIEW */
+.prev-box{background:#000;border:1px solid #1c1f2a;border-radius:12px;padding:22px 20px 18px;text-align:center;margin-bottom:12px;position:relative;overflow:hidden}
+.prev-box::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at center,rgba(59,130,246,.04) 0%,transparent 65%);pointer-events:none}
+.prev-lbl{font-size:10px;color:#2e3448;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:5px;letter-spacing:1.2px;text-transform:uppercase}
+.prev-pn{font-family:'Rajdhani',sans-serif;font-size:21px;font-weight:600;color:#fff;margin-bottom:4px;line-height:1}
+.pline{display:block}
+.prev-role{font-size:14px;font-weight:700;line-height:1.3;display:inline-block}
+.prev-rank{font-size:13px;font-weight:700;line-height:1.3;display:inline-block}
+.prev-donate{font-size:12.5px;font-weight:700;line-height:1.3;display:inline-block}
+
+/* ANIMATIONS */
+@keyframes do-rainbow{0%{color:#ff2020}14%{color:#ff8800}28%{color:#ffee00}42%{color:#00ee00}57%{color:#00aaff}71%{color:#8833ff}85%{color:#ff00cc}100%{color:#ff2020}}
+@keyframes do-slide-bg{0%{background-position:200% center}100%{background-position:-200% center}}
+@keyframes do-rotate-pos{0%{background-position:0% 50%}25%{background-position:100% 50%}50%{background-position:100% 0%}75%{background-position:0% 0%}100%{background-position:0% 50%}}
+.class-rainbow{animation:do-rainbow 2s linear infinite}
+.class-slide{background-size:300% auto!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;animation:do-slide-bg linear infinite}
+.class-rotate{background-size:400% 400%!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;animation:do-rotate-pos linear infinite}
+
+/* ACTION BUTTONS */
+.abtn2{width:100%;padding:12px;border:none;border-radius:9px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:7px;transition:.15s;display:flex;align-items:center;justify-content:center;gap:7px}
+.upd{background:var(--green);color:#fff}
+.upd:hover{background:#16a34a;transform:translateY(-1px);box-shadow:0 4px 14px rgba(34,197,94,.3)}
+.rst{background:var(--yellow);color:#120e00}
+.rst:hover{background:#ca8a04;transform:translateY(-1px)}
+.rmv{background:var(--red);color:#fff}
+.rmv:hover{background:#dc2626;transform:translateY(-1px)}
+.gen-btn{width:100%;padding:13px;border:none;border-radius:9px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;box-shadow:0 4px 20px rgba(99,60,222,.3)}
+.gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(99,60,222,.45)}
+
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:.2s}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:26px 28px;max-width:420px;width:92%;transform:scale(.94);transition:.2s;box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.modal-overlay.show .modal{transform:scale(1)}
+.modal-icon{font-size:36px;margin-bottom:10px;display:block;text-align:center}
+.modal-title{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;margin-bottom:8px;text-align:center}
+.modal-desc{font-size:12px;color:var(--muted2);line-height:1.65;margin-bottom:18px;text-align:center}
+.modal-desc a{color:var(--accent2);text-decoration:none}
+.modal-desc a:hover{text-decoration:underline}
+.modal-btn{background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;padding:10px 28px;cursor:pointer;transition:.15s;display:block;margin:0 auto}
+.modal-btn:hover{background:#2563eb}
+
+/* FORMAT MODAL */
+.fmt-modal{max-width:480px}
+.fmt-box{background:#0d1117;border:1px solid var(--border2);border-radius:8px;padding:14px;font-family:'Courier New',monospace;font-size:12.5px;color:#e6edf3;line-height:1.8;margin-bottom:12px;white-space:pre;overflow-x:auto}
+.fmt-info{font-size:11.5px;color:var(--muted2);line-height:1.6;margin-bottom:14px}
+.fmt-info a{color:var(--accent2);text-decoration:none;word-break:break-all}
+.fmt-info a:hover{text-decoration:underline}
+.fmt-actions{display:flex;gap:8px}
+.copy-btn{flex:1;padding:9px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.14s;display:flex;align-items:center;justify-content:center;gap:6px}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent2)}
+.copy-btn.copied{background:rgba(34,197,94,.1);border-color:var(--green);color:var(--green)}
+.close-fmt-btn{padding:9px 18px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;color:var(--muted2);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.14s}
+.close-fmt-btn:hover{border-color:var(--border2);color:var(--text)}
+
+/* WATERMARK */
+.watermark{font-size:8.5px;color:#1e2235;text-align:center;margin-top:6px;user-select:none}
+
+/* NOTIF */
+.notif{position:fixed;top:18px;right:18px;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:11px 16px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.55);transform:translateX(130%);transition:transform .3s cubic-bezier(.34,1.2,.64,1);z-index:999}
+.notif.show{transform:translateX(0)}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--panel)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- PREVIEW ONLY MODAL -->
+<div class="modal-overlay" id="previewModal">
+  <div class="modal">
+    <span class="modal-icon">ℹ️</span>
+    <div class="modal-title">Ini Hanya Preview</div>
+    <div class="modal-desc">Perubahan yang kamu buat di sini <strong>hanya simulasi preview</strong> dan tidak akan tersimpan atau mempengaruhi data di server Roblox.<br><br>Untuk mengaplikasikan title secara nyata, gunakan sistem Title Editor di dalam game.</div>
+    <button class="modal-btn" onclick="closeModal('previewModal')">Oke, Mengerti</button>
+  </div>
+</div>
+
+<!-- FORMAT MODAL -->
+<div class="modal-overlay" id="fmtModal">
+  <div class="modal fmt-modal">
+    <div class="modal-title">📋 Format Pengajuan Title</div>
+    <pre class="fmt-box" id="fmtBox"></pre>
+    <div class="fmt-info">
+      Silahkan kirim ke Discord: <a href="https://discord.com/channels/1401548241962664067/1423661370297159822" target="_blank">#title-request</a><br><br>
+      ⚠️ <strong>Jangan lupa sertakan bukti sudah donate ke server 10rb Robux</strong>, bisa cek di <a href="https://www.roblox.com/transactions" target="_blank">roblox.com/transactions</a> — pilih <em>Type of Transaction: Purchases</em>, sertakan screenshot/watermark.<br><br>
+      Kalau via transfer bisa DM <strong>kak Ixie</strong> di Discord: <strong>@laazhy</strong>
+    </div>
+    <div class="fmt-actions">
+      <button class="copy-btn" id="copyBtn" onclick="copyFormat()">📋 Copy Format</button>
+      <button class="close-fmt-btn" onclick="closeModal('fmtModal')">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIF -->
+<div class="notif" id="notif"><span id="nIcon">✅</span><span id="nMsg">Done!</span></div>
+
+<div class="window">
+  <!-- TITLEBAR -->
+  <div class="titlebar">
+    <div class="tb-l">
+      <div class="tb-icon">🏷️</div>
+      <div>
+        <div class="tb-name">Title Editor Pro</div>
+        <div class="tb-sub">Advanced Title Customization System</div>
+        <div class="tb-by">by Atlas Club</div>
+      </div>
+    </div>
+    <button class="tb-close" onclick="toast('❌','Editor closed')">✕</button>
+  </div>
+
+  <div class="layout">
+    <!-- LEFT PANEL -->
+    <div class="left">
+      <div class="ph">
+        <div class="ph-title">👤 Players</div>
+        <button class="rbtn" onclick="toast('🔄','Refreshed')">🔄 Refresh</button>
+      </div>
+
+      <!-- ADD YOUR OWN USER -->
+      <div class="add-user-box">
+        <div class="add-user-title">➕ TAMBAH AKUN KAMU</div>
+        <input class="add-user-inp" id="addDisplayName" placeholder="Display Name..." maxlength="32">
+        <input class="add-user-inp" id="addUsername" placeholder="@Username Roblox..." maxlength="32">
+        <button class="add-user-btn" onclick="addCustomUser()">Tambah & Pilih</button>
+      </div>
+
+      <div class="sep-label">Staff Atlas Club</div>
+      <div class="sw">
+        <span class="si">🔍</span>
+        <input type="text" placeholder="Search..." oninput="filterP(this.value)">
+      </div>
+      <div class="plist" id="plist"></div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right">
+      <div class="sel-badge"><span class="dn">♦</span> Selected: <span id="selLabel">—</span></div>
+
+      <!-- ROLE CONFIG -->
+      <div class="sec" id="roleSec">
+        <div class="sec-title"><span class="dot"></span>🏷️ Role Configuration</div>
+        <div class="flabel">📌 Role Name (atas)</div>
+        <input class="inp" id="roleName" placeholder="Enter role name..." oninput="liveUpdate()">
+        <div class="flabel">✨ Animation Mode</div>
+        <div class="agrid" id="roleAnimGrid">
+          <button class="abtn on" onclick="setA('role','static',this)"><span class="aico">🎨</span>static</button>
+          <button class="abtn" onclick="setA('role','slide',this)"><span class="aico">➡️</span>slide</button>
+          <button class="abtn" onclick="setA('role','rotate',this)"><span class="aico">🔄</span>rotate</button>
+          <button class="abtn" onclick="setA('role','rainbow',this)"><span class="aico">🌈</span>rainbow</button>
+        </div>
+        <div class="flabel">⚡ Animation Speed</div>
+        <div class="sprow">
+          <label>0.2x</label>
+          <input type="range" class="spslider" id="roleSpd" min="0.2" max="5" step="0.1" value="1"
+                 oninput="document.getElementById('roleSpdV').textContent=parseFloat(this.value).toFixed(1)+'x';liveUpdate()">
+          <span class="spval" id="roleSpdV">1.0x</span>
+          <label>5.0x</label>
+        </div>
+        <div class="color-wrap" id="roleColorWrap">
+          <div class="flabel">🎨 Color Gradient <span id="roleColorHint" style="color:var(--muted);font-size:9.5px;margin-left:4px">(1 warna)</span></div>
+          <div class="cerr" id="roleErr"></div>
+          <div class="color-tags" id="roleColorTags"></div>
+          <button class="add-color-btn" id="roleAddBtn" onclick="openPicker('role')">＋ Add Color</button>
+          <div class="cpicker" id="rolePicker" style="display:none">
+            <div class="cpicker-top">
+              <div style="flex:1"><div class="hue-box" id="roleHueBox"><div class="hue-cursor" id="roleHueCursor"></div></div></div>
+              <div class="hue-strip-wrap"><div class="hue-strip" id="roleHueStrip"><div class="hue-strip-cursor" id="roleHueStripCursor"></div></div></div>
+            </div>
+            <div class="cpicker-preview-row">
+              <div class="cpicker-preview-box" id="rolePickerPreview"></div>
+              <div class="cpicker-hex-wrap"><label>HEX</label><input type="text" id="roleHexInput" maxlength="6" placeholder="ffffff" oninput="onHexInput('role')"></div>
+            </div>
+            <div class="cpicker-rgb">
+              <div class="cpicker-rgb-item"><label>R</label><input type="number" id="roleR" min="0" max="255" oninput="onRGBInput('role')"></div>
+              <div class="cpicker-rgb-item"><label>G</label><input type="number" id="roleG" min="0" max="255" oninput="onRGBInput('role')"></div>
+              <div class="cpicker-rgb-item"><label>B</label><input type="number" id="roleB" min="0" max="255" oninput="onRGBInput('role')"></div>
+            </div>
+            <div class="swatches" id="roleSwatches"></div>
+            <button class="add-color-btn" style="margin-bottom:0" onclick="confirmPickerColor('role')">✅ Confirm Color</button>
+          </div>
+        </div>
+      </div>
+      <hr class="div">
+
+      <!-- RANK CONFIG -->
+      <div class="sec" id="rankSec">
+        <div class="sec-title"><span class="dot" style="background:#a78bfa"></span>📋 Rank Configuration</div>
+        <div class="flabel">📌 Rank Name (bawah)</div>
+        <input class="inp" id="rankName" placeholder="Enter rank name..." oninput="liveUpdate()">
+        <div class="flabel">✨ Animation Mode</div>
+        <div class="agrid" id="rankAnimGrid">
+          <button class="abtn on" onclick="setA('rank','static',this)"><span class="aico">🎨</span>static</button>
+          <button class="abtn" onclick="setA('rank','slide',this)"><span class="aico">➡️</span>slide</button>
+          <button class="abtn" onclick="setA('rank','rotate',this)"><span class="aico">🔄</span>rotate</button>
+          <button class="abtn" onclick="setA('rank','rainbow',this)"><span class="aico">🌈</span>rainbow</button>
+        </div>
+        <div class="flabel">⚡ Animation Speed</div>
+        <div class="sprow">
+          <label>0.2x</label>
+          <input type="range" class="spslider" id="rankSpd" min="0.2" max="5" step="0.1" value="1"
+                 oninput="document.getElementById('rankSpdV').textContent=parseFloat(this.value).toFixed(1)+'x';liveUpdate()">
+          <span class="spval" id="rankSpdV">1.0x</span>
+          <label>5.0x</label>
+        </div>
+        <div class="color-wrap" id="rankColorWrap">
+          <div class="flabel">🎨 Color Gradient <span id="rankColorHint" style="color:var(--muted);font-size:9.5px;margin-left:4px">(1 warna)</span></div>
+          <div class="cerr" id="rankErr"></div>
+          <div class="color-tags" id="rankColorTags"></div>
+          <button class="add-color-btn" id="rankAddBtn" onclick="openPicker('rank')">＋ Add Color</button>
+          <div class="cpicker" id="rankPicker" style="display:none">
+            <div class="cpicker-top">
+              <div style="flex:1"><div class="hue-box" id="rankHueBox"><div class="hue-cursor" id="rankHueCursor"></div></div></div>
+              <div class="hue-strip-wrap"><div class="hue-strip" id="rankHueStrip"><div class="hue-strip-cursor" id="rankHueStripCursor"></div></div></div>
+            </div>
+            <div class="cpicker-preview-row">
+              <div class="cpicker-preview-box" id="rankPickerPreview"></div>
+              <div class="cpicker-hex-wrap"><label>HEX</label><input type="text" id="rankHexInput" maxlength="6" placeholder="ffffff" oninput="onHexInput('rank')"></div>
+            </div>
+            <div class="cpicker-rgb">
+              <div class="cpicker-rgb-item"><label>R</label><input type="number" id="rankR" min="0" max="255" oninput="onRGBInput('rank')"></div>
+              <div class="cpicker-rgb-item"><label>G</label><input type="number" id="rankG" min="0" max="255" oninput="onRGBInput('rank')"></div>
+              <div class="cpicker-rgb-item"><label>B</label><input type="number" id="rankB" min="0" max="255" oninput="onRGBInput('rank')"></div>
+            </div>
+            <div class="swatches" id="rankSwatches"></div>
+            <button class="add-color-btn" style="margin-bottom:0" onclick="confirmPickerColor('rank')">✅ Confirm Color</button>
+          </div>
+        </div>
+      </div>
+      <hr class="div">
+
+      <!-- TOP DONATE — DISABLED (Admin only) -->
+      <div class="sec" style="position:relative">
+        <div style="position:absolute;inset:0;z-index:5;pointer-events:all;cursor:not-allowed;border-radius:8px;background:rgba(11,13,19,.5);display:flex;align-items:center;justify-content:center">
+          <div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:7px 16px;font-size:11px;color:#f87171;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.5px">🔒 ADMIN ONLY</div>
+        </div>
+        <div style="opacity:.3;pointer-events:none">
+          <div class="sec-title"><span class="dot" style="background:#f59e0b"></span>🎁 Top Donate Label</div>
+          <input class="inp" placeholder="Custom top donate text..." disabled>
+          <div class="agrid">
+            <button class="abtn on"><span class="aico">🎨</span>static</button>
+            <button class="abtn"><span class="aico">➡️</span>slide</button>
+            <button class="abtn"><span class="aico">🔄</span>rotate</button>
+            <button class="abtn"><span class="aico">🌈</span>rainbow</button>
+          </div>
+        </div>
+      </div>
+      <hr class="div">
+
+      <!-- LIVE PREVIEW -->
+      <div class="prev-box">
+        <div class="prev-lbl">👁 Live Preview</div>
+        <div class="prev-pn" id="ppn">PlayerName</div>
+        <div class="pline"><span class="prev-role" id="pr">Preview Role</span></div>
+        <div class="pline"><span class="prev-rank" id="pk">Preview Rank</span></div>
+        <div class="pline"><span class="prev-donate" id="pd" style="color:#FFA500">Top Donate Preview</span></div>
+        <div class="watermark">Atlas Club Title Editor Pro • Simulation Only</div>
+      </div>
+
+      <button class="abtn2 upd" onclick="doUpdate()">✅ Update Title</button>
+      <button class="abtn2 rst" onclick="doReset()">🔄 Reset to Default</button>
+      <button class="abtn2 rmv" onclick="doRemove()">🗑️ Remove Title</button>
+      <button class="gen-btn" onclick="generateFormat()">📋 Generate Format Pengajuan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+const S = {
+  player: null,
+  role:   { anim:'static', colors:[] },
+  rank:   { anim:'static', colors:[] },
+};
+const PS = {};
+['role','rank'].forEach(s => PS[s] = { hue:0, sat:1, val:1 });
+
+// ══════════════════════════════════════════
+//  PLAYERS DATA
+// ══════════════════════════════════════════
+const LOCKED_PLAYERS = [
+  { id:'fari', disp:'Fari Noveri', user:'FariNoveri_2', av:'F', col:'#3b82f6', role:'', locked:true },
+];
+
+const STAFF_PLAYERS = [
+  { id:'ixie',    disp:'ixie',       user:'fairypoines',  av:'I', col:'#ef4444',  role:'admin',    locked:true },
+  { id:'scoco',   disp:'Scoco',      user:'Scoco672',     av:'S', col:'#f59e0b',  role:'admin',    locked:true },
+  { id:'flux',    disp:'FluxAyam',   user:'Punten_10',    av:'F', col:'#3b82f6',  role:'admin',    locked:true, verified:true },
+  { id:'fil',     disp:'Fil',        user:'filzawall',    av:'F', col:'#8b5cf6',  role:'mod',      locked:true },
+  { id:'fennz',   disp:'Fennz',      user:'FennzPake_Z',  av:'F', col:'#06b6d4',  role:'mod',      locked:true },
+  { id:'missel',  disp:'Missel',     user:'02Mcell',      av:'M', col:'#22c55e',  role:'builder',  locked:true },
+  { id:'aizu',    disp:'Aizu',       user:'Ngensta',      av:'A', col:'#ec4899',  role:'security', locked:true },
+  { id:'amuri',   disp:'Amuri',      user:'Amuriii666',   av:'A', col:'#f97316',  role:'dj',       locked:true },
+  { id:'zolo',    disp:'zolo',       user:'cangibob',     av:'Z', col:'#14b8a6',  role:'soon',     locked:true },
+];
+
+let customUsers = [];
+let filtered = [...STAFF_PLAYERS];
+
+const BADGE_MAP = {
+  admin:    ['ADMIN','badge-admin'],
+  mod:      ['MOD','badge-mod'],
+  builder:  ['BUILDER','badge-builder'],
+  security: ['SECURITY','badge-security'],
+  dj:       ['DJ','badge-dj'],
+  soon:     ['SOON','badge-soon'],
+};
+
+function renderList() {
+  const el = document.getElementById('plist');
+  el.innerHTML = '';
+
+  // Custom users first (selectable)
+  customUsers.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'pitem' + (S.player?.id === p.id ? ' on' : '');
+    d.innerHTML = `<div class="pavatar" style="background:${p.col}">${p.av}</div>
+      <div class="pinfo">
+        <div class="pdisp">${escHtml(p.disp)} <span class="pbadge badge-you">KAMU</span></div>
+        <div class="puser">@${escHtml(p.user)}</div>
+      </div>`;
+    d.onclick = () => selPlayer(p);
+    el.appendChild(d);
+  });
+
+  // Fari (locked, pajangan)
+  LOCKED_PLAYERS.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'pitem locked';
+    d.title = 'Pajangan — tidak bisa dipilih';
+    d.innerHTML = `<div class="pavatar" style="background:${p.col}">${p.av}</div>
+      <div class="pinfo">
+        <div class="pdisp">${escHtml(p.disp)}</div>
+        <div class="puser">@${escHtml(p.user)}</div>
+      </div>
+      <span class="lock-icon">🔒</span>`;
+    el.appendChild(d);
+  });
+
+  // Staff (locked)
+  filtered.forEach(p => {
+    const [bLabel, bClass] = BADGE_MAP[p.role] || ['',''];
+    const verBadge = p.verified ? ' <span style="color:#3b82f6;font-size:11px" title="Verified Roblox">✔</span>' : '';
+    const d = document.createElement('div');
+    d.className = 'pitem locked';
+    d.title = 'Staff Atlas Club — tidak bisa dipilih';
+    d.innerHTML = `<div class="pavatar" style="background:${p.col}">${p.av}</div>
+      <div class="pinfo">
+        <div class="pdisp">${escHtml(p.disp)}${verBadge}${bLabel?`<span class="pbadge ${bClass}">${bLabel}</span>`:''}</div>
+        <div class="puser">@${escHtml(p.user)}</div>
+      </div>
+      <span class="lock-icon">🔒</span>`;
+    el.appendChild(d);
+  });
+}
+
+function filterP(q) {
+  const s = q.toLowerCase();
+  filtered = STAFF_PLAYERS.filter(p => p.disp.toLowerCase().includes(s) || p.user.toLowerCase().includes(s));
+  renderList();
+}
+
+function addCustomUser() {
+  const disp = document.getElementById('addDisplayName').value.trim();
+  const user = document.getElementById('addUsername').value.trim().replace(/^@/,'');
+  if (!disp || !user) { toast('⚠️','Isi Display Name dan Username dulu!'); return; }
+  const colors = ['#3b82f6','#8b5cf6','#06b6d4','#22c55e','#f59e0b','#ec4899'];
+  const newP = {
+    id: 'custom_'+Date.now(),
+    disp, user,
+    av: disp[0].toUpperCase(),
+    col: colors[customUsers.length % colors.length],
+    locked: false,
+  };
+  customUsers = [newP]; // only one custom at a time (replace)
+  document.getElementById('addDisplayName').value = '';
+  document.getElementById('addUsername').value = '';
+  renderList();
+  selPlayer(newP);
+  toast('✅', `Akun "${disp}" ditambahkan & dipilih!`);
+}
+
+function selPlayer(p) {
+  if (p.locked) return;
+  S.player = p;
+  document.getElementById('selLabel').textContent = p.disp;
+  document.getElementById('ppn').textContent = p.disp;
+  renderList();
+  liveUpdate();
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ══════════════════════════════════════════
+//  ANIM MODE + COLOR RULES
+// ══════════════════════════════════════════
+const COLOR_RULES = {
+  static:  { min:1, max:1, hint:'(1 warna)' },
+  slide:   { min:2, max:3, hint:'(2–3 warna)' },
+  rotate:  { min:2, max:5, hint:'(2–5 warna)' },
+  rainbow: { min:0, max:0, hint:'' },
+};
+
+function setA(sec, mode, btn) {
+  S[sec].anim = mode;
+  btn.closest('.agrid').querySelectorAll('.abtn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  const wrap = document.getElementById(sec+'ColorWrap');
+  if (mode === 'rainbow') { wrap.classList.add('hidden'); }
+  else {
+    wrap.classList.remove('hidden');
+    const rule = COLOR_RULES[mode];
+    if (mode === 'static' && S[sec].colors.length > 1) S[sec].colors = [S[sec].colors[0]];
+    if (S[sec].colors.length > rule.max) S[sec].colors = S[sec].colors.slice(0, rule.max);
+    renderColorTags(sec);
+    updateHint(sec);
+  }
+  liveUpdate();
+}
+
+function updateHint(sec) {
+  const rule = COLOR_RULES[S[sec].anim];
+  document.getElementById(sec+'ColorHint').textContent = rule.hint;
+  const addBtn = document.getElementById(sec+'AddBtn');
+  if (!addBtn) return;
+  addBtn.style.display = (S[sec].anim === 'rainbow' || S[sec].colors.length >= rule.max && rule.max > 0) ? 'none' : '';
+}
+
+function showErr(sec, msg) {
+  const el = document.getElementById(sec+'Err');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════════
+//  COLOR TAGS
+// ══════════════════════════════════════════
+function renderColorTags(sec) {
+  const wrap = document.getElementById(sec+'ColorTags');
+  wrap.innerHTML = '';
+  S[sec].colors.forEach((hex, i) => {
+    const tag = document.createElement('div');
+    tag.className = 'ctag';
+    tag.innerHTML = `<div class="ctag-dot" style="background:#${hex}"></div>
+      <span>#${hex.toUpperCase()}</span>
+      <button class="ctag-del" onclick="removeColor('${sec}',${i})">×</button>`;
+    wrap.appendChild(tag);
+  });
+  updateHint(sec);
+  liveUpdate();
+}
+
+function removeColor(sec, i) {
+  S[sec].colors.splice(i, 1);
+  renderColorTags(sec);
+}
+
+// ══════════════════════════════════════════
+//  COLOR PICKER
+// ══════════════════════════════════════════
+const SWATCHES = [
+  'FF0000','FF4400','FF8800','FFCC00','FFFF00','AAFF00',
+  '00FF00','00FFAA','00FFFF','0088FF','0000FF','8800FF',
+  'FF00FF','FF0088','FFFFFF','CCCCCC','888888','444444',
+  '000000','FF6B6B','4ECDC4','45B7D1','96CEB4','FFEAA7',
+];
+
+function initSwatches(sec) {
+  const el = document.getElementById(sec+'Swatches');
+  el.innerHTML = '';
+  SWATCHES.forEach(hex => {
+    const s = document.createElement('div');
+    s.className = 'swatch';
+    s.style.background = '#'+hex;
+    s.title = '#'+hex;
+    s.onclick = () => setPickerHex(sec, hex);
+    el.appendChild(s);
+  });
+}
+
+function openPicker(sec) {
+  const rule = COLOR_RULES[S[sec].anim];
+  if (S[sec].colors.length >= rule.max && rule.max > 0) {
+    showErr(sec, `Maksimal ${rule.max} warna untuk mode ${S[sec].anim}`);
+    return;
+  }
+  const picker = document.getElementById(sec+'Picker');
+  const isOpen = picker.style.display !== 'none';
+  ['role','rank'].forEach(s => document.getElementById(s+'Picker').style.display = 'none');
+  if (!isOpen) {
+    picker.style.display = '';
+    initSwatches(sec);
+    setPickerHex(sec, 'ffffff');
+    initPickerEvents(sec);
+  }
+}
+
+function initPickerEvents(sec) {
+  const box = document.getElementById(sec+'HueBox');
+  const strip = document.getElementById(sec+'HueStrip');
+  if (box._bound) return;
+  box._bound = true;
+  let dBox = false, dStrip = false;
+  box.addEventListener('mousedown', e => { dBox = true; pickFromBox(sec, e); });
+  strip.addEventListener('mousedown', e => { dStrip = true; pickFromStrip(sec, e); });
+  document.addEventListener('mousemove', e => { if(dBox) pickFromBox(sec,e); if(dStrip) pickFromStrip(sec,e); });
+  document.addEventListener('mouseup', () => { dBox = false; dStrip = false; });
+  box.addEventListener('touchstart', e => { dBox = true; pickFromBox(sec, e.touches[0]); }, {passive:true});
+  strip.addEventListener('touchstart', e => { dStrip = true; pickFromStrip(sec, e.touches[0]); }, {passive:true});
+  document.addEventListener('touchmove', e => { if(dBox) pickFromBox(sec,e.touches[0]); if(dStrip) pickFromStrip(sec,e.touches[0]); }, {passive:true});
+  document.addEventListener('touchend', () => { dBox = false; dStrip = false; });
+}
+
+function pickFromBox(sec, e) {
+  const box = document.getElementById(sec+'HueBox');
+  const rect = box.getBoundingClientRect();
+  const x = Math.max(0, Math.min(1, (e.clientX-rect.left)/rect.width));
+  const y = Math.max(0, Math.min(1, (e.clientY-rect.top)/rect.height));
+  PS[sec].sat = x; PS[sec].val = 1-y;
+  updatePickerFromHSV(sec);
+  const cur = document.getElementById(sec+'HueCursor');
+  cur.style.left = (x*100)+'%'; cur.style.top = (y*100)+'%';
+}
+
+function pickFromStrip(sec, e) {
+  const strip = document.getElementById(sec+'HueStrip');
+  const rect = strip.getBoundingClientRect();
+  const y = Math.max(0, Math.min(1, (e.clientY-rect.top)/rect.height));
+  PS[sec].hue = y * 360;
+  updatePickerFromHSV(sec);
+  document.getElementById(sec+'HueStripCursor').style.top = (y*100)+'%';
+  const hueCol = hsvToHex(PS[sec].hue, 1, 1);
+  document.getElementById(sec+'HueBox').style.background =
+    `linear-gradient(to bottom,rgba(0,0,0,0),rgba(0,0,0,1)),linear-gradient(to right,#fff,#${hueCol})`;
+}
+
+function updatePickerFromHSV(sec) {
+  const hex = hsvToHex(PS[sec].hue, PS[sec].sat, PS[sec].val);
+  const [r,g,b] = hexToRgb(hex);
+  document.getElementById(sec+'HexInput').value = hex.toUpperCase();
+  document.getElementById(sec+'R').value = r;
+  document.getElementById(sec+'G').value = g;
+  document.getElementById(sec+'B').value = b;
+  document.getElementById(sec+'PickerPreview').style.background = '#'+hex;
+}
+
+function setPickerHex(sec, hex) {
+  const [r,g,b] = hexToRgb(hex);
+  const [h,sat,v] = rgbToHsv(r,g,b);
+  PS[sec].hue=h; PS[sec].sat=sat; PS[sec].val=v;
+  document.getElementById(sec+'HexInput').value = hex.toUpperCase();
+  document.getElementById(sec+'R').value = r;
+  document.getElementById(sec+'G').value = g;
+  document.getElementById(sec+'B').value = b;
+  document.getElementById(sec+'PickerPreview').style.background = '#'+hex;
+  const hueCol = hsvToHex(h,1,1);
+  document.getElementById(sec+'HueBox').style.background =
+    `linear-gradient(to bottom,rgba(0,0,0,0),rgba(0,0,0,1)),linear-gradient(to right,#fff,#${hueCol})`;
+  document.getElementById(sec+'HueCursor').style.left = (sat*100)+'%';
+  document.getElementById(sec+'HueCursor').style.top = ((1-v)*100)+'%';
+  document.getElementById(sec+'HueStripCursor').style.top = (h/360*100)+'%';
+}
+
+function onHexInput(sec) {
+  const val = document.getElementById(sec+'HexInput').value.replace('#','');
+  if (/^[0-9a-fA-F]{6}$/.test(val)) setPickerHex(sec, val);
+}
+function onRGBInput(sec) {
+  const r = Math.min(255, parseInt(document.getElementById(sec+'R').value)||0);
+  const g = Math.min(255, parseInt(document.getElementById(sec+'G').value)||0);
+  const b = Math.min(255, parseInt(document.getElementById(sec+'B').value)||0);
+  setPickerHex(sec, rgbToHex(r,g,b));
+}
+function confirmPickerColor(sec) {
+  const hex = document.getElementById(sec+'HexInput').value.replace('#','').toUpperCase();
+  if (!/^[0-9a-fA-F]{6}$/.test(hex)) { showErr(sec,'Hex tidak valid'); return; }
+  const rule = COLOR_RULES[S[sec].anim];
+  if (S[sec].colors.length >= rule.max && rule.max > 0) { showErr(sec,`Maksimal ${rule.max} warna`); return; }
+  S[sec].colors.push(hex);
+  document.getElementById(sec+'Picker').style.display = 'none';
+  renderColorTags(sec);
+}
+
+// ══════════════════════════════════════════
+//  COLOR MATH
+// ══════════════════════════════════════════
+function hsvToHex(h,s,v){
+  h=((h%360)+360)%360;
+  const c=v*s,x=c*(1-Math.abs((h/60)%2-1)),m=v-c;
+  let r,g,b;
+  if(h<60){r=c;g=x;b=0}else if(h<120){r=x;g=c;b=0}else if(h<180){r=0;g=c;b=x}
+  else if(h<240){r=0;g=x;b=c}else if(h<300){r=x;g=0;b=c}else{r=c;g=0;b=x}
+  return rgbToHex(Math.round((r+m)*255),Math.round((g+m)*255),Math.round((b+m)*255));
+}
+function rgbToHex(r,g,b){return[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('')}
+function hexToRgb(hex){const h=hex.replace('#','');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
+function rgbToHsv(r,g,b){
+  r/=255;g/=255;b/=255;
+  const max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;
+  let h=0,s=max===0?0:d/max,v=max;
+  if(d!==0){if(max===r)h=((g-b)/d)%6;else if(max===g)h=(b-r)/d+2;else h=(r-g)/d+4;h*=60;if(h<0)h+=360;}
+  return[h,s,v];
+}
+function lightenHex(hex,amt){let[r,g,b]=hexToRgb(hex);return`rgb(${Math.min(255,Math.round(r+(255-r)*amt))},${Math.min(255,Math.round(g+(255-g)*amt))},${Math.min(255,Math.round(b+(255-b)*amt))})`}
+function darkenHex(hex,amt){let[r,g,b]=hexToRgb(hex);return`rgb(${Math.max(0,Math.round(r*(1-amt)))},${Math.max(0,Math.round(g*(1-amt)))},${Math.max(0,Math.round(b*(1-amt)))})`}
+
+// ══════════════════════════════════════════
+//  LIVE PREVIEW
+// ══════════════════════════════════════════
+function applyEl(elId, sec, spdId) {
+  const el = document.getElementById(elId);
+  const anim = S[sec].anim;
+  const colors = S[sec].colors;
+  const spd = parseFloat(document.getElementById(spdId).value)||1;
+  el.className = el.className.replace(/class-\w+/g,'').trim();
+  el.style.cssText = '';
+  if (anim === 'rainbow') {
+    el.classList.add('class-rainbow');
+    el.style.animationDuration = (2/spd).toFixed(2)+'s';
+    return;
+  }
+  if (colors.length === 0) { el.style.color='#555'; return; }
+  const col = '#'+colors[0];
+  if (anim === 'static') {
+    el.style.color = col;
+  } else if (anim === 'slide') {
+    const hexList = colors.map(c=>'#'+c);
+    let grad;
+    if (hexList.length === 1) {
+      grad = `linear-gradient(90deg,${darkenHex(hexList[0],.5)},${hexList[0]},${lightenHex(hexList[0],.7)},${hexList[0]},${darkenHex(hexList[0],.5)})`;
+    } else {
+      const arr = [...hexList, ...hexList.slice().reverse()];
+      grad = `linear-gradient(90deg,${arr.map((c,i)=>`${c} ${Math.round(i/(arr.length-1)*100)}%`).join(',')})`;
+    }
+    el.style.background = grad;
+    el.style.backgroundSize = '300% auto';
+    el.style.webkitBackgroundClip = 'text';
+    el.style.backgroundClip = 'text';
+    el.style.webkitTextFillColor = 'transparent';
+    el.classList.add('class-slide');
+    el.style.animationDuration = (3/spd).toFixed(2)+'s';
+  } else if (anim === 'rotate') {
+    const hexList = colors.map(c=>'#'+c);
+    const cyc = [...hexList, hexList[0]];
+    el.style.background = `linear-gradient(135deg,${cyc.map((c,i)=>`${c} ${Math.round(i/(cyc.length-1)*100)}%`).join(',')})`;
+    el.style.backgroundSize = '400% 400%';
+    el.style.webkitBackgroundClip = 'text';
+    el.style.backgroundClip = 'text';
+    el.style.webkitTextFillColor = 'transparent';
+    el.classList.add('class-rotate');
+    el.style.animationDuration = (4/spd).toFixed(2)+'s';
+  }
+}
+
+function liveUpdate() {
+  document.getElementById('pr').textContent = document.getElementById('roleName').value || 'Preview Role';
+  document.getElementById('pk').textContent = document.getElementById('rankName').value || 'Preview Rank';
+  applyEl('pr','role','roleSpd');
+  applyEl('pk','rank','rankSpd');
+}
+
+// ══════════════════════════════════════════
+//  ACTION BUTTONS
+// ══════════════════════════════════════════
+function doUpdate() {
+  if (!S.player) { toast('⚠️','Pilih player dulu!'); return; }
+  showModal('previewModal');
+}
+function doReset() {
+  if (!S.player) { toast('⚠️','Pilih player dulu!'); return; }
+  ['role','rank'].forEach(sec => {
+    S[sec].anim = 'static'; S[sec].colors = [];
+    document.getElementById(sec+'AnimGrid').querySelectorAll('.abtn').forEach((b,i)=>b.classList.toggle('on',i===0));
+    document.getElementById(sec+'ColorWrap').classList.remove('hidden');
+    renderColorTags(sec);
+  });
+  ['roleName','rankName'].forEach(id=>document.getElementById(id).value='');
+  ['roleSpd','rankSpd'].forEach(id=>document.getElementById(id).value=1);
+  document.getElementById('roleSpdV').textContent='1.0x';
+  document.getElementById('rankSpdV').textContent='1.0x';
+  liveUpdate();
+  toast('🔄','Reset to default');
+}
+function doRemove() {
+  if (!S.player) { toast('⚠️','Pilih player dulu!'); return; }
+  toast('🗑️',`Title removed for ${S.player.disp}`);
+}
+
+// ══════════════════════════════════════════
+//  GENERATE FORMAT
+// ══════════════════════════════════════════
+function generateFormat() {
+  if (!S.player) { toast('⚠️','Pilih player dulu!'); return; }
+  const usn = S.player.user;
+  const role = document.getElementById('roleName').value || '—';
+  const rank = document.getElementById('rankName').value || '—';
+
+  // Build color string
+  let colorLines = '';
+  const rColors = S.role.colors;
+  const kColors = S.rank.colors;
+  const rAnim = S.role.anim;
+  const kAnim = S.rank.anim;
+
+  if (rAnim === 'rainbow') {
+    colorLines += `Role  : 🌈 Rainbow\n`;
+  } else if (rColors.length > 0) {
+    colorLines += `Role  : ${rColors.map(c=>'#'+c).join(', ')} (${rAnim})\n`;
+  }
+  if (kAnim === 'rainbow') {
+    colorLines += `Rank  : 🌈 Rainbow\n`;
+  } else if (kColors.length > 0) {
+    colorLines += `Rank  : ${kColors.map(c=>'#'+c).join(', ')} (${kAnim})\n`;
+  }
+  if (!colorLines) colorLines = '(belum ada warna dipilih)';
+
+  const fmt = `usn : ${usn}
+atas : ${role}
+bawah : ${rank}
+warna :
+${colorLines}
+——————————————————
+Atlas Club Title Request
+Preview by: Title Editor Pro`;
+
+  document.getElementById('fmtBox').textContent = fmt;
+  showModal('fmtModal');
+}
+
+function copyFormat() {
+  const text = document.getElementById('fmtBox').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✅ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copy Format'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    toast('✅','Format disalin!');
+  });
+}
+
+// ══════════════════════════════════════════
+//  MODALS
+// ══════════════════════════════════════════
+function showModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+['previewModal','fmtModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    if (e.target === document.getElementById(id)) closeModal(id);
+  });
+});
+
+// ══════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════
+let _nt;
+function toast(icon,msg){
+  document.getElementById('nIcon').textContent=icon;
+  document.getElementById('nMsg').textContent=msg;
+  const el=document.getElementById('notif');
+  el.classList.add('show'); clearTimeout(_nt);
+  _nt=setTimeout(()=>el.classList.remove('show'),2700);
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+renderList();
+['role','rank'].forEach(sec => updateHint(sec));
+liveUpdate();
+</script>
+</body>
+</html>
