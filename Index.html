@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Title Editor Pro — Atlas Club</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -19,7 +19,9 @@ body{
   min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
   background-image:radial-gradient(ellipse at 15% 50%,rgba(59,130,246,.05) 0%,transparent 55%),
                    radial-gradient(ellipse at 85% 20%,rgba(139,92,246,.04) 0%,transparent 45%);
+  touch-action:none;
 }
+html{touch-action:none}
 .window{
   background:var(--bg);border:1px solid var(--border);border-radius:14px;
   width:100%;max-width:980px;
@@ -1157,6 +1159,23 @@ function init() {
 }
 
 init();
+
+// ══════════════════════════════════════════
+//  PREVENT ZOOM (PC + Mobile)
+// ══════════════════════════════════════════
+document.addEventListener('wheel', function(e) {
+  if (e.ctrlKey) e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && (e.key==='+' || e.key==='-' || e.key==='=' || e.key==='0' || e.key==='_')) {
+    e.preventDefault();
+  }
+});
+
+document.addEventListener('gesturestart', function(e) { e.preventDefault(); }, { passive: false });
+document.addEventListener('gesturechange', function(e) { e.preventDefault(); }, { passive: false });
+document.addEventListener('gestureend', function(e) { e.preventDefault(); }, { passive: false });
 </script>
 </body>
 </html>
