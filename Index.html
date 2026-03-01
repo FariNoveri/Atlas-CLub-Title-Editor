@@ -41,7 +41,9 @@ body{
 .layout{display:grid;grid-template-columns:235px 1fr;height:calc(100vh - 120px);max-height:860px}
 
 /* LEFT */
-.left{background:var(--panel);border-right:1px solid var(--border);padding:15px 14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+.left{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.left-top{padding:15px 14px 8px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.left-staff{flex:1;overflow-y:auto;padding:10px 14px 14px;display:flex;flex-direction:column;gap:4px}
 .ph{display:flex;align-items:center;justify-content:space-between}
 .ph-title{font-family:'Rajdhani',sans-serif;font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:6px}
 .rbtn{background:transparent;border:1px solid var(--border2);color:var(--accent2);padding:3px 8px;border-radius:6px;font-size:10.5px;cursor:pointer;font-family:'Exo 2',sans-serif;transition:.14s}
@@ -74,13 +76,15 @@ body{
 .pdisp{font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
 .puser{font-size:10px;color:var(--muted2)}
 .pbadge{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;flex-shrink:0}
-.badge-admin{background:rgba(239,68,68,.2);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+.badge-admin{background:rgba(249,115,22,.2);color:#fb923c;border:1px solid rgba(249,115,22,.3)}
+.badge-owner{background:rgba(239,68,68,.2);color:#f87171;border:1px solid rgba(239,68,68,.3)}
 .badge-mod{background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
-.badge-builder{background:rgba(234,179,8,.2);color:#fbbf24;border:1px solid rgba(234,179,8,.3)}
+.badge-builder{background:rgba(168,85,247,.2);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
 .badge-dj{background:rgba(168,85,247,.2);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
 .badge-security{background:rgba(34,197,94,.2);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
 .badge-soon{background:rgba(100,116,139,.15);color:var(--muted2);border:1px solid var(--border);font-style:italic}
 .badge-you{background:rgba(16,185,129,.2);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.badge-creator{background:rgba(255,165,0,.18);color:#fbbf24;border:1px solid rgba(255,165,0,.35);font-style:italic}
 .lock-icon{font-size:9px;color:var(--muted);margin-left:auto;flex-shrink:0}
 
 /* RIGHT */
@@ -212,6 +216,9 @@ body{
 .notif{position:fixed;top:18px;right:18px;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:11px 16px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.55);transform:translateX(130%);transition:transform .3s cubic-bezier(.34,1.2,.64,1);z-index:999}
 .notif.show{transform:translateX(0)}
 
+/* speed row hidden */
+.sprow.hidden{display:none}
+
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:var(--panel)}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
@@ -266,25 +273,30 @@ body{
   <div class="layout">
     <!-- LEFT PANEL -->
     <div class="left">
-      <div class="ph">
-        <div class="ph-title">👤 Players</div>
-        <button class="rbtn" onclick="toast('🔄','Refreshed')">🔄 Refresh</button>
+      <!-- TOP: fixed, not scrollable -->
+      <div class="left-top">
+        <div class="ph">
+          <div class="ph-title">👤 Players</div>
+          <button class="rbtn" onclick="toast('🔄','Refreshed')">🔄 Refresh</button>
+        </div>
+        <!-- ADD YOUR OWN USER -->
+        <div class="add-user-box">
+          <div class="add-user-title">➕ TAMBAH AKUN KAMU</div>
+          <input class="add-user-inp" id="addDisplayName" placeholder="Display Name..." maxlength="32">
+          <input class="add-user-inp" id="addUsername" placeholder="@Username Roblox..." maxlength="32">
+          <button class="add-user-btn" onclick="addCustomUser()">Tambah & Pilih</button>
+        </div>
+        <!-- SEARCH -->
+        <div class="sw">
+          <span class="si">🔍</span>
+          <input type="text" placeholder="Cari staff..." oninput="filterP(this.value)">
+        </div>
       </div>
-
-      <!-- ADD YOUR OWN USER -->
-      <div class="add-user-box">
-        <div class="add-user-title">➕ TAMBAH AKUN KAMU</div>
-        <input class="add-user-inp" id="addDisplayName" placeholder="Display Name..." maxlength="32">
-        <input class="add-user-inp" id="addUsername" placeholder="@Username Roblox..." maxlength="32">
-        <button class="add-user-btn" onclick="addCustomUser()">Tambah & Pilih</button>
+      <!-- STAFF LIST: scrollable -->
+      <div class="left-staff">
+        <div class="sep-label" style="border-top:none;padding-top:0">Staff Atlas Club</div>
+        <div class="plist" id="plist"></div>
       </div>
-
-      <div class="sep-label">Staff Atlas Club</div>
-      <div class="sw">
-        <span class="si">🔍</span>
-        <input type="text" placeholder="Search..." oninput="filterP(this.value)">
-      </div>
-      <div class="plist" id="plist"></div>
     </div>
 
     <!-- RIGHT PANEL -->
@@ -304,9 +316,9 @@ body{
           <button class="abtn" onclick="setA('role','rainbow',this)"><span class="aico">🌈</span>rainbow</button>
         </div>
         <div class="flabel">⚡ Animation Speed</div>
-        <div class="sprow">
-          <label>0.2x</label>
-          <input type="range" class="spslider" id="roleSpd" min="0.2" max="5" step="0.1" value="1"
+        <div class="sprow" id="roleSpdRow">
+          <label>0.5x</label>
+          <input type="range" class="spslider" id="roleSpd" min="0.5" max="5" step="0.5" value="1"
                  oninput="document.getElementById('roleSpdV').textContent=parseFloat(this.value).toFixed(1)+'x';liveUpdate()">
           <span class="spval" id="roleSpdV">1.0x</span>
           <label>5.0x</label>
@@ -350,9 +362,9 @@ body{
           <button class="abtn" onclick="setA('rank','rainbow',this)"><span class="aico">🌈</span>rainbow</button>
         </div>
         <div class="flabel">⚡ Animation Speed</div>
-        <div class="sprow">
-          <label>0.2x</label>
-          <input type="range" class="spslider" id="rankSpd" min="0.2" max="5" step="0.1" value="1"
+        <div class="sprow" id="rankSpdRow">
+          <label>0.5x</label>
+          <input type="range" class="spslider" id="rankSpd" min="0.5" max="5" step="0.5" value="1"
                  oninput="document.getElementById('rankSpdV').textContent=parseFloat(this.value).toFixed(1)+'x';liveUpdate()">
           <span class="spval" id="rankSpdV">1.0x</span>
           <label>5.0x</label>
@@ -432,34 +444,67 @@ const PS = {};
 ['role','rank'].forEach(s => PS[s] = { hue:0, sat:1, val:1 });
 
 // ══════════════════════════════════════════
+//  SESSION STORAGE (persists on refresh, clears on tab close)
+// ══════════════════════════════════════════
+const SS_KEY = 'atlasClubTitleEditor_v2';
+
+function saveSession() {
+  try {
+    const data = {
+      role: { anim: S.role.anim, colors: [...S.role.colors] },
+      rank: { anim: S.rank.anim, colors: [...S.rank.colors] },
+      roleName: document.getElementById('roleName').value,
+      rankName: document.getElementById('rankName').value,
+      roleSpd: document.getElementById('roleSpd').value,
+      rankSpd: document.getElementById('rankSpd').value,
+      playerId: S.player?.id || null,
+      customUsers: customUsers,
+    };
+    sessionStorage.setItem(SS_KEY, JSON.stringify(data));
+  } catch(e) {}
+}
+
+function loadSession() {
+  try {
+    const raw = sessionStorage.getItem(SS_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch(e) { return null; }
+}
+
+// ══════════════════════════════════════════
 //  PLAYERS DATA
 // ══════════════════════════════════════════
-const LOCKED_PLAYERS = [
-  { id:'fari', disp:'Fari Noveri', user:'FariNoveri_2', av:'F', col:'#3b82f6', role:'', locked:true },
+// Change 1-6: Updated roles/colors, added Ara, FariNoveri as creator
+const CREATOR_PLAYERS = [
+  { id:'fari', disp:'FariNoveri', user:'FariNoveri_2', av:'F', col:'#ff6600', role:'creator', locked:true },
 ];
 
 const STAFF_PLAYERS = [
-  { id:'ixie',    disp:'ixie',       user:'fairypoines',  av:'I', col:'#ef4444',  role:'admin',    locked:true },
-  { id:'scoco',   disp:'Scoco',      user:'Scoco672',     av:'S', col:'#f59e0b',  role:'admin',    locked:true },
-  { id:'flux',    disp:'FluxAyam',   user:'Punten_10',    av:'F', col:'#3b82f6',  role:'admin',    locked:true, verified:true },
-  { id:'fil',     disp:'Fil',        user:'filzawall',    av:'F', col:'#8b5cf6',  role:'mod',      locked:true },
-  { id:'fennz',   disp:'Fennz',      user:'FennzPake_Z',  av:'F', col:'#06b6d4',  role:'mod',      locked:true },
-  { id:'missel',  disp:'Missel',     user:'02Mcell',      av:'M', col:'#22c55e',  role:'builder',  locked:true },
-  { id:'aizu',    disp:'Aizu',       user:'Ngensta',      av:'A', col:'#ec4899',  role:'security', locked:true },
-  { id:'amuri',   disp:'Amuri',      user:'Amuriii666',   av:'A', col:'#f97316',  role:'dj',       locked:true },
-  { id:'zolo',    disp:'zolo',       user:'cangibob',     av:'Z', col:'#14b8a6',  role:'soon',     locked:true },
+  { id:'flux',    disp:'FluxAyam',   user:'Punten_10',    av:'F', col:'#ef4444',  role:'owner',    locked:true, verified:true },
+  { id:'aizu',    disp:'Aizu',       user:'Ngensta',      av:'A', col:'#a855f7',  role:'builder',  locked:true },
+  { id:'ixie',    disp:'ixie',       user:'fairypoines',  av:'I', col:'#f97316',  role:'admin',    locked:true },
+  { id:'amuri',   disp:'Amuri',      user:'Amuriii666',   av:'A', col:'#f97316',  role:'admin',    locked:true },
+  { id:'scoco',   disp:'Scoco',      user:'Scoco672',     av:'S', col:'#f97316',  role:'admin',    locked:true },
+  { id:'fil',     disp:'Fil',        user:'filzawall',    av:'F', col:'#f97316',  role:'admin',    locked:true },
+  { id:'ara',     disp:'Ara',        user:'arawrr30',     av:'A', col:'#f97316',  role:'admin',    locked:true },
+  { id:'missel',  disp:'Missel',     user:'02Mcell',      av:'M', col:'#38bdf8',  role:'mod',      locked:true },
+  { id:'fennz',   disp:'Fennz',      user:'FennzPake_Z',  av:'F', col:'#38bdf8',  role:'mod',      locked:true },
+  { id:'zolo',    disp:'zolo',       user:'cangibob',     av:'Z', col:'#38bdf8',  role:'mod',      locked:true },
 ];
 
 let customUsers = [];
 let filtered = [...STAFF_PLAYERS];
 
 const BADGE_MAP = {
+  owner:    ['OWNER','badge-owner'],
   admin:    ['ADMIN','badge-admin'],
   mod:      ['MOD','badge-mod'],
   builder:  ['BUILDER','badge-builder'],
   security: ['SECURITY','badge-security'],
   dj:       ['DJ','badge-dj'],
   soon:     ['SOON','badge-soon'],
+  creator:  ['PEMBUAT WEB','badge-creator'],
 };
 
 function renderList() {
@@ -479,14 +524,14 @@ function renderList() {
     el.appendChild(d);
   });
 
-  // Fari (locked, pajangan)
-  LOCKED_PLAYERS.forEach(p => {
+  // Change 7: FariNoveri as creator (rainbow animation on badge)
+  CREATOR_PLAYERS.forEach(p => {
     const d = document.createElement('div');
     d.className = 'pitem locked';
-    d.title = 'Pajangan — tidak bisa dipilih';
+    d.title = 'Pembuat Website — tidak bisa dipilih';
     d.innerHTML = `<div class="pavatar" style="background:${p.col}">${p.av}</div>
       <div class="pinfo">
-        <div class="pdisp">${escHtml(p.disp)}</div>
+        <div class="pdisp">${escHtml(p.disp)} <span class="pbadge badge-creator class-rainbow" style="animation-duration:1.5s">🌈 PEMBUAT WEB</span></div>
         <div class="puser">@${escHtml(p.user)}</div>
       </div>
       <span class="lock-icon">🔒</span>`;
@@ -533,6 +578,7 @@ function addCustomUser() {
   document.getElementById('addUsername').value = '';
   renderList();
   selPlayer(newP);
+  saveSession();
   toast('✅', `Akun "${disp}" ditambahkan & dipilih!`);
 }
 
@@ -542,6 +588,7 @@ function selPlayer(p) {
   document.getElementById('selLabel').textContent = p.disp;
   document.getElementById('ppn').textContent = p.disp;
   renderList();
+  saveSession();
   liveUpdate();
 }
 
@@ -563,6 +610,15 @@ function setA(sec, mode, btn) {
   S[sec].anim = mode;
   btn.closest('.agrid').querySelectorAll('.abtn').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
+
+  // Change 8: hide speed row when static
+  const spdRow = document.getElementById(sec+'SpdRow');
+  if (mode === 'static') {
+    spdRow.classList.add('hidden');
+  } else {
+    spdRow.classList.remove('hidden');
+  }
+
   const wrap = document.getElementById(sec+'ColorWrap');
   if (mode === 'rainbow') { wrap.classList.add('hidden'); }
   else {
@@ -573,6 +629,7 @@ function setA(sec, mode, btn) {
     renderColorTags(sec);
     updateHint(sec);
   }
+  saveSession();
   liveUpdate();
 }
 
@@ -605,6 +662,7 @@ function renderColorTags(sec) {
     wrap.appendChild(tag);
   });
   updateHint(sec);
+  saveSession();
   liveUpdate();
 }
 
@@ -772,6 +830,16 @@ function applyEl(elId, sec, spdId) {
   const spd = parseFloat(document.getElementById(spdId).value)||1;
   el.className = el.className.replace(/class-\w+/g,'').trim();
   el.style.cssText = '';
+
+  // Change 8: static = no animation, just solid color or default
+  if (anim === 'static') {
+    if (colors.length > 0) {
+      el.style.color = '#'+colors[0];
+    } else {
+      el.style.color = '#aab0cc';
+    }
+    return;
+  }
   if (anim === 'rainbow') {
     el.classList.add('class-rainbow');
     el.style.animationDuration = (2/spd).toFixed(2)+'s';
@@ -779,9 +847,7 @@ function applyEl(elId, sec, spdId) {
   }
   if (colors.length === 0) { el.style.color='#555'; return; }
   const col = '#'+colors[0];
-  if (anim === 'static') {
-    el.style.color = col;
-  } else if (anim === 'slide') {
+  if (anim === 'slide') {
     const hexList = colors.map(c=>'#'+c);
     let grad;
     if (hexList.length === 1) {
@@ -815,6 +881,7 @@ function liveUpdate() {
   document.getElementById('pk').textContent = document.getElementById('rankName').value || 'Preview Rank';
   applyEl('pr','role','roleSpd');
   applyEl('pk','rank','rankSpd');
+  saveSession();
 }
 
 // ══════════════════════════════════════════
@@ -830,12 +897,15 @@ function doReset() {
     S[sec].anim = 'static'; S[sec].colors = [];
     document.getElementById(sec+'AnimGrid').querySelectorAll('.abtn').forEach((b,i)=>b.classList.toggle('on',i===0));
     document.getElementById(sec+'ColorWrap').classList.remove('hidden');
+    // Change 8: hide speed row on reset (static)
+    document.getElementById(sec+'SpdRow').classList.add('hidden');
     renderColorTags(sec);
   });
   ['roleName','rankName'].forEach(id=>document.getElementById(id).value='');
   ['roleSpd','rankSpd'].forEach(id=>document.getElementById(id).value=1);
   document.getElementById('roleSpdV').textContent='1.0x';
   document.getElementById('rankSpdV').textContent='1.0x';
+  saveSession();
   liveUpdate();
   toast('🔄','Reset to default');
 }
@@ -853,7 +923,6 @@ function generateFormat() {
   const role = document.getElementById('roleName').value || '—';
   const rank = document.getElementById('rankName').value || '—';
 
-  // Build color string
   let colorLines = '';
   const rColors = S.role.colors;
   const kColors = S.rank.colors;
@@ -893,7 +962,6 @@ function copyFormat() {
     btn.classList.add('copied');
     setTimeout(() => { btn.textContent = '📋 Copy Format'; btn.classList.remove('copied'); }, 2000);
   }).catch(() => {
-    // fallback
     const ta = document.createElement('textarea');
     ta.value = text; document.body.appendChild(ta);
     ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
@@ -925,11 +993,88 @@ function toast(icon,msg){
 }
 
 // ══════════════════════════════════════════
-//  INIT
+//  RESTORE ANIM UI STATE
 // ══════════════════════════════════════════
-renderList();
-['role','rank'].forEach(sec => updateHint(sec));
-liveUpdate();
+function restoreAnimUI(sec, mode) {
+  const grid = document.getElementById(sec+'AnimGrid');
+  const modeMap = { static:0, slide:1, rotate:2, rainbow:3 };
+  grid.querySelectorAll('.abtn').forEach((b,i) => b.classList.toggle('on', i === (modeMap[mode]??0)));
+  const spdRow = document.getElementById(sec+'SpdRow');
+  if (mode === 'static') {
+    spdRow.classList.add('hidden');
+  } else {
+    spdRow.classList.remove('hidden');
+  }
+  const wrap = document.getElementById(sec+'ColorWrap');
+  if (mode === 'rainbow') {
+    wrap.classList.add('hidden');
+  } else {
+    wrap.classList.remove('hidden');
+  }
+  updateHint(sec);
+}
+
+// ══════════════════════════════════════════
+//  INIT — restore session if available
+// ══════════════════════════════════════════
+function init() {
+  const saved = loadSession();
+  if (saved) {
+    // restore custom users
+    if (saved.customUsers && saved.customUsers.length > 0) {
+      customUsers = saved.customUsers;
+    }
+    renderList();
+
+    // restore role/rank state
+    ['role','rank'].forEach(sec => {
+      if (saved[sec]) {
+        S[sec].anim = saved[sec].anim || 'static';
+        S[sec].colors = saved[sec].colors || [];
+      }
+    });
+
+    // restore inputs
+    if (saved.roleName) document.getElementById('roleName').value = saved.roleName;
+    if (saved.rankName) document.getElementById('rankName').value = saved.rankName;
+    if (saved.roleSpd) {
+      document.getElementById('roleSpd').value = saved.roleSpd;
+      document.getElementById('roleSpdV').textContent = parseFloat(saved.roleSpd).toFixed(1)+'x';
+    }
+    if (saved.rankSpd) {
+      document.getElementById('rankSpd').value = saved.rankSpd;
+      document.getElementById('rankSpdV').textContent = parseFloat(saved.rankSpd).toFixed(1)+'x';
+    }
+
+    // restore anim UI
+    restoreAnimUI('role', S.role.anim);
+    restoreAnimUI('rank', S.rank.anim);
+    renderColorTags('role');
+    renderColorTags('rank');
+
+    // restore selected player
+    if (saved.playerId) {
+      const custom = customUsers.find(p => p.id === saved.playerId);
+      if (custom) {
+        S.player = custom;
+        document.getElementById('selLabel').textContent = custom.disp;
+        document.getElementById('ppn').textContent = custom.disp;
+        renderList();
+      }
+    }
+  } else {
+    renderList();
+    ['role','rank'].forEach(sec => {
+      updateHint(sec);
+      // Change 8: hide speed initially since default is static
+      document.getElementById(sec+'SpdRow').classList.add('hidden');
+    });
+  }
+
+  liveUpdate();
+}
+
+init();
 </script>
 </body>
 </html>
