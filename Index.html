@@ -216,8 +216,61 @@ body{
 .notif{position:fixed;top:18px;right:18px;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:11px 16px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.55);transform:translateX(130%);transition:transform .3s cubic-bezier(.34,1.2,.64,1);z-index:999}
 .notif.show{transform:translateX(0)}
 
+
 /* speed row hidden */
 .sprow.hidden{display:none}
+
+/* ══ MOBILE RESPONSIVE ══ */
+.mob-tabs{display:none}
+@media(max-width:700px){
+  body{padding:8px}
+  .window{border-radius:10px}
+  .layout{
+    display:flex;flex-direction:column;
+    height:auto;max-height:none;
+  }
+  .left{
+    border-right:none;
+    border-bottom:1px solid var(--border);
+    height:auto;
+  }
+  .left-top{padding:12px 12px 8px}
+  .left-staff{
+    max-height:220px;
+    overflow-y:auto;
+    padding:8px 12px 12px;
+  }
+  .right{padding:12px 12px}
+  /* shrink titlebar */
+  .tb-name{font-size:14px}
+  .tb-sub,.tb-by{display:none}
+  .tb-icon{width:28px;height:28px;font-size:12px}
+  /* tabs for mobile: Players | Editor */
+  .mob-tabs{
+    display:flex;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+  }
+  .mob-tab{
+    flex:1;padding:9px 0;text-align:center;
+    font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;
+    color:var(--muted2);cursor:pointer;border:none;background:none;
+    border-bottom:2px solid transparent;transition:.15s;
+  }
+  .mob-tab.active{color:var(--accent2);border-bottom-color:var(--accent)}
+  .layout{flex-direction:column}
+  .left{display:none}
+  .left.mob-show{display:flex}
+  .right{display:none}
+  .right.mob-show{display:block}
+  /* make agrid 2 col on small screens */
+  .agrid{grid-template-columns:repeat(2,1fr)}
+  /* speed slider readable */
+  .sprow{flex-wrap:wrap;gap:6px}
+  .spslider{width:100%;order:3;flex-basis:100%}
+}
+
 
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:var(--panel)}
@@ -270,9 +323,15 @@ body{
     <button class="tb-close" onclick="toast('❌','Editor closed')">✕</button>
   </div>
 
+  <!-- MOBILE TABS -->
+  <div class="mob-tabs" id="mobTabs">
+    <button class="mob-tab active" id="tabPlayers" onclick="switchTab('players')">👤 Players</button>
+    <button class="mob-tab" id="tabEditor" onclick="switchTab('editor')">🏷️ Editor</button>
+  </div>
+
   <div class="layout">
     <!-- LEFT PANEL -->
-    <div class="left">
+    <div class="left mob-show" id="panelLeft">
       <!-- TOP: fixed, not scrollable -->
       <div class="left-top">
         <div class="ph">
@@ -300,7 +359,7 @@ body{
     </div>
 
     <!-- RIGHT PANEL -->
-    <div class="right">
+    <div class="right" id="panelRight">
       <div class="sel-badge"><span class="dn">♦</span> Selected: <span id="selLabel">—</span></div>
 
       <!-- ROLE CONFIG -->
@@ -590,6 +649,8 @@ function selPlayer(p) {
   renderList();
   saveSession();
   liveUpdate();
+  // Auto switch to editor on mobile
+  if (window.innerWidth <= 700) switchTab('editor');
 }
 
 function escHtml(s) {
@@ -1015,6 +1076,27 @@ function restoreAnimUI(sec, mode) {
 }
 
 // ══════════════════════════════════════════
+//  MOBILE TABS
+// ══════════════════════════════════════════
+function switchTab(tab) {
+  const left = document.getElementById('panelLeft');
+  const right = document.getElementById('panelRight');
+  const tP = document.getElementById('tabPlayers');
+  const tE = document.getElementById('tabEditor');
+  if (tab === 'players') {
+    left.classList.add('mob-show');
+    right.classList.remove('mob-show');
+    tP.classList.add('active');
+    tE.classList.remove('active');
+  } else {
+    right.classList.add('mob-show');
+    left.classList.remove('mob-show');
+    tE.classList.add('active');
+    tP.classList.remove('active');
+  }
+}
+
+// ══════════════════════════════════════════
 //  INIT — restore session if available
 // ══════════════════════════════════════════
 function init() {
@@ -1052,7 +1134,7 @@ function init() {
     renderColorTags('role');
     renderColorTags('rank');
 
-    // restore selected playerr
+    // restore selected player
     if (saved.playerId) {
       const custom = customUsers.find(p => p.id === saved.playerId);
       if (custom) {
