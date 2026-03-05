@@ -95,11 +95,6 @@ html{touch-action:none}
 .sel-badge .dn{color:var(--gold);margin-right:4px}
 #selLabel{color:var(--accent2)}
 
-/* DISABLED SECTION */
-.sec-disabled{opacity:.35;pointer-events:none;position:relative}
-.sec-disabled-overlay{position:absolute;inset:0;z-index:10;cursor:not-allowed;background:rgba(11,13,19,.3);border-radius:8px;display:flex;align-items:center;justify-content:center}
-.disabled-badge{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:6px 14px;font-size:11px;color:#f87171;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.5px}
-
 .sec{margin-bottom:18px;position:relative}
 .sec-title{font-family:'Rajdhani',sans-serif;font-size:12.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px;display:flex;align-items:center;gap:6px}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
@@ -121,6 +116,7 @@ html{touch-action:none}
 .spslider{flex:1;-webkit-appearance:none;height:4px;background:var(--border2);border-radius:2px;outline:none;cursor:pointer}
 .spslider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 0 6px rgba(59,130,246,.55)}
 .spval{font-size:11px;font-weight:600;color:var(--accent2);min-width:32px;text-align:right}
+.sprow.hidden{display:none}
 
 /* COLOR */
 .color-wrap.hidden{display:none}
@@ -169,10 +165,11 @@ html{touch-action:none}
 /* ANIMATIONS */
 @keyframes do-rainbow{0%{color:#ff2020}14%{color:#ff8800}28%{color:#ffee00}42%{color:#00ee00}57%{color:#00aaff}71%{color:#8833ff}85%{color:#ff00cc}100%{color:#ff2020}}
 @keyframes do-slide-bg{0%{background-position:200% center}100%{background-position:-200% center}}
-@keyframes do-rotate-pos{0%{background-position:0% 50%}25%{background-position:100% 50%}50%{background-position:100% 0%}75%{background-position:0% 0%}100%{background-position:0% 50%}}
+/* rotate kini pakai JS requestAnimationFrame — tidak butuh @keyframes CSS */
 .class-rainbow{animation:do-rainbow 2s linear infinite}
 .class-slide{background-size:300% auto!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;animation:do-slide-bg linear infinite}
-.class-rotate{background-size:400% 400%!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;animation:do-rotate-pos linear infinite}
+/* class-rotate hanya sebagai marker — gradient angle diupdate via JS */
+.class-rotate{-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;}
 
 /* ACTION BUTTONS */
 .abtn2{width:100%;padding:12px;border:none;border-radius:9px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:7px;transition:.15s;display:flex;align-items:center;justify-content:center;gap:7px}
@@ -218,61 +215,31 @@ html{touch-action:none}
 .notif{position:fixed;top:18px;right:18px;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:11px 16px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.55);transform:translateX(130%);transition:transform .3s cubic-bezier(.34,1.2,.64,1);z-index:999}
 .notif.show{transform:translateX(0)}
 
-
-/* speed row hidden */
-.sprow.hidden{display:none}
-
-/* ══ MOBILE RESPONSIVE ══ */
+/* MOBILE RESPONSIVE */
 .mob-tabs{display:none}
 @media(max-width:700px){
   body{padding:8px}
   .window{border-radius:10px}
-  .layout{
-    display:flex;flex-direction:column;
-    height:auto;max-height:none;
-  }
-  .left{
-    border-right:none;
-    border-bottom:1px solid var(--border);
-    height:auto;
-  }
+  .layout{display:flex;flex-direction:column;height:auto;max-height:none;}
+  .left{border-right:none;border-bottom:1px solid var(--border);height:auto;}
   .left-top{padding:12px 12px 8px}
-  .left-staff{
-    max-height:220px;
-    overflow-y:auto;
-    padding:8px 12px 12px;
-  }
+  .left-staff{max-height:220px;overflow-y:auto;padding:8px 12px 12px;}
   .right{padding:12px 12px}
-  /* shrink titlebar */
   .tb-name{font-size:14px}
   .tb-sub,.tb-by{display:none}
   .tb-icon{width:28px;height:28px;font-size:12px}
-  /* tabs for mobile: Players | Editor */
-  .mob-tabs{
-    display:flex;
-    background:var(--panel);
-    border-bottom:1px solid var(--border);
-    flex-shrink:0;
-  }
-  .mob-tab{
-    flex:1;padding:9px 0;text-align:center;
-    font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;
-    color:var(--muted2);cursor:pointer;border:none;background:none;
-    border-bottom:2px solid transparent;transition:.15s;
-  }
+  .mob-tabs{display:flex;background:var(--panel);border-bottom:1px solid var(--border);flex-shrink:0;}
+  .mob-tab{flex:1;padding:9px 0;text-align:center;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:.15s;}
   .mob-tab.active{color:var(--accent2);border-bottom-color:var(--accent)}
   .layout{flex-direction:column}
   .left{display:none}
   .left.mob-show{display:flex}
   .right{display:none}
   .right.mob-show{display:block}
-  /* make agrid 2 col on small screens */
   .agrid{grid-template-columns:repeat(2,1fr)}
-  /* speed slider readable */
   .sprow{flex-wrap:wrap;gap:6px}
   .spslider{width:100%;order:3;flex-basis:100%}
 }
-
 
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:var(--panel)}
@@ -334,26 +301,22 @@ html{touch-action:none}
   <div class="layout">
     <!-- LEFT PANEL -->
     <div class="left mob-show" id="panelLeft">
-      <!-- TOP: fixed, not scrollable -->
       <div class="left-top">
         <div class="ph">
           <div class="ph-title">👤 Players</div>
           <button class="rbtn" onclick="toast('🔄','Refreshed')">🔄 Refresh</button>
         </div>
-        <!-- ADD YOUR OWN USER -->
         <div class="add-user-box">
           <div class="add-user-title">➕ TAMBAH AKUN KAMU</div>
           <input class="add-user-inp" id="addDisplayName" placeholder="Display Name..." maxlength="32">
           <input class="add-user-inp" id="addUsername" placeholder="@Username Roblox..." maxlength="32">
           <button class="add-user-btn" onclick="addCustomUser()">Tambah & Pilih</button>
         </div>
-        <!-- SEARCH -->
         <div class="sw">
           <span class="si">🔍</span>
           <input type="text" placeholder="Cari staff..." oninput="filterP(this.value)">
         </div>
       </div>
-      <!-- STAFF LIST: scrollable -->
       <div class="left-staff">
         <div class="sep-label" style="border-top:none;padding-top:0">Staff Atlas Club</div>
         <div class="plist" id="plist"></div>
@@ -373,11 +336,11 @@ html{touch-action:none}
         <div class="agrid" id="roleAnimGrid">
           <button class="abtn on" onclick="setA('role','static',this)"><span class="aico">🎨</span>static</button>
           <button class="abtn" onclick="setA('role','slide',this)"><span class="aico">➡️</span>slide</button>
-          <button class="abtn" onclick="setA('role','rotate',this)"><span class="aico">🔄</span>rotate</button>
+          <button class="abtn" disabled title="Coming Soon" style="opacity:.35;cursor:not-allowed"><span class="aico">🔄</span>rotate</button>
           <button class="abtn" onclick="setA('role','rainbow',this)"><span class="aico">🌈</span>rainbow</button>
         </div>
         <div class="flabel">⚡ Animation Speed</div>
-        <div class="sprow" id="roleSpdRow">
+        <div class="sprow hidden" id="roleSpdRow">
           <label>0.5x</label>
           <input type="range" class="spslider" id="roleSpd" min="0.5" max="5" step="0.5" value="1"
                  oninput="document.getElementById('roleSpdV').textContent=parseFloat(this.value).toFixed(1)+'x';liveUpdate()">
@@ -419,11 +382,11 @@ html{touch-action:none}
         <div class="agrid" id="rankAnimGrid">
           <button class="abtn on" onclick="setA('rank','static',this)"><span class="aico">🎨</span>static</button>
           <button class="abtn" onclick="setA('rank','slide',this)"><span class="aico">➡️</span>slide</button>
-          <button class="abtn" onclick="setA('rank','rotate',this)"><span class="aico">🔄</span>rotate</button>
+          <button class="abtn" disabled title="Coming Soon" style="opacity:.35;cursor:not-allowed"><span class="aico">🔄</span>rotate</button>
           <button class="abtn" onclick="setA('rank','rainbow',this)"><span class="aico">🌈</span>rainbow</button>
         </div>
         <div class="flabel">⚡ Animation Speed</div>
-        <div class="sprow" id="rankSpdRow">
+        <div class="sprow hidden" id="rankSpdRow">
           <label>0.5x</label>
           <input type="range" class="spslider" id="rankSpd" min="0.5" max="5" step="0.5" value="1"
                  oninput="document.getElementById('rankSpdV').textContent=parseFloat(this.value).toFixed(1)+'x';liveUpdate()">
@@ -505,7 +468,43 @@ const PS = {};
 ['role','rank'].forEach(s => PS[s] = { hue:0, sat:1, val:1 });
 
 // ══════════════════════════════════════════
-//  SESSION STORAGE (persists on refresh, clears on tab close)
+//  ROTATE ANIMATION — rAF loop per element
+//  Mirip Roblox: gradient.Rotation += speed * dt * 30
+// ══════════════════════════════════════════
+const rotateLoops = {}; // key -> rafId
+
+function startRotateLoop(elId, hexColors, spd) {
+  stopRotateLoop(elId);
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const cyc = [...hexColors, hexColors[0]];
+  const gradBase = cyc.map((c,i) => `${c} ${Math.round(i/(cyc.length-1)*100)}%`).join(',');
+  let angle = 0;
+  let last = performance.now();
+
+  function frame(now) {
+    if (!el.classList.contains('class-rotate')) return;
+    const dt = Math.min((now - last) / 1000, 0.1);
+    last = now;
+    angle = (angle + spd * dt * 30) % 360; // sama persis dengan Roblox: spd * dt * 30
+    el.style.background = `linear-gradient(${angle}deg,${gradBase})`;
+    el.style.webkitBackgroundClip = 'text';
+    el.style.backgroundClip = 'text';
+    el.style.webkitTextFillColor = 'transparent';
+    rotateLoops[elId] = requestAnimationFrame(frame);
+  }
+  rotateLoops[elId] = requestAnimationFrame(frame);
+}
+
+function stopRotateLoop(elId) {
+  if (rotateLoops[elId]) {
+    cancelAnimationFrame(rotateLoops[elId]);
+    delete rotateLoops[elId];
+  }
+}
+
+// ══════════════════════════════════════════
+//  SESSION STORAGE
 // ══════════════════════════════════════════
 const SS_KEY = 'atlasClubTitleEditor_v2';
 
@@ -536,7 +535,6 @@ function loadSession() {
 // ══════════════════════════════════════════
 //  PLAYERS DATA
 // ══════════════════════════════════════════
-// Change 1-6: Updated roles/colors, added Ara, FariNoveri as creator
 const CREATOR_PLAYERS = [
   { id:'fari', disp:'FariNoveri', user:'FariNoveri_2', av:'F', col:'#ff6600', role:'creator', locked:true },
 ];
@@ -571,8 +569,6 @@ const BADGE_MAP = {
 function renderList() {
   const el = document.getElementById('plist');
   el.innerHTML = '';
-
-  // Custom users first (selectable)
   customUsers.forEach(p => {
     const d = document.createElement('div');
     d.className = 'pitem' + (S.player?.id === p.id ? ' on' : '');
@@ -584,12 +580,9 @@ function renderList() {
     d.onclick = () => selPlayer(p);
     el.appendChild(d);
   });
-
-  // Change 7: FariNoveri as creator (rainbow animation on badge)
   CREATOR_PLAYERS.forEach(p => {
     const d = document.createElement('div');
     d.className = 'pitem locked';
-    d.title = 'Pembuat Website — tidak bisa dipilih';
     d.innerHTML = `<div class="pavatar" style="background:${p.col}">${p.av}</div>
       <div class="pinfo">
         <div class="pdisp">${escHtml(p.disp)} <span class="pbadge badge-creator class-rainbow" style="animation-duration:1.5s">🌈 PEMBUAT WEB</span></div>
@@ -598,14 +591,11 @@ function renderList() {
       <span class="lock-icon">🔒</span>`;
     el.appendChild(d);
   });
-
-  // Staff (locked)
   filtered.forEach(p => {
     const [bLabel, bClass] = BADGE_MAP[p.role] || ['',''];
     const verBadge = p.verified ? ' <span style="color:#3b82f6;font-size:11px" title="Verified Roblox">✔</span>' : '';
     const d = document.createElement('div');
     d.className = 'pitem locked';
-    d.title = 'Staff Atlas Club — tidak bisa dipilih';
     d.innerHTML = `<div class="pavatar" style="background:${p.col}">${p.av}</div>
       <div class="pinfo">
         <div class="pdisp">${escHtml(p.disp)}${verBadge}${bLabel?`<span class="pbadge ${bClass}">${bLabel}</span>`:''}</div>
@@ -634,7 +624,7 @@ function addCustomUser() {
     col: colors[customUsers.length % colors.length],
     locked: false,
   };
-  customUsers = [newP]; // only one custom at a time (replace)
+  customUsers = [newP];
   document.getElementById('addDisplayName').value = '';
   document.getElementById('addUsername').value = '';
   renderList();
@@ -651,7 +641,6 @@ function selPlayer(p) {
   renderList();
   saveSession();
   liveUpdate();
-  // Auto switch to editor on mobile
   if (window.innerWidth <= 700) switchTab('editor');
 }
 
@@ -673,15 +662,9 @@ function setA(sec, mode, btn) {
   S[sec].anim = mode;
   btn.closest('.agrid').querySelectorAll('.abtn').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
-
-  // Change 8: hide speed row when static
   const spdRow = document.getElementById(sec+'SpdRow');
-  if (mode === 'static') {
-    spdRow.classList.add('hidden');
-  } else {
-    spdRow.classList.remove('hidden');
-  }
-
+  if (mode === 'static') { spdRow.classList.add('hidden'); }
+  else { spdRow.classList.remove('hidden'); }
   const wrap = document.getElementById(sec+'ColorWrap');
   if (mode === 'rainbow') { wrap.classList.add('hidden'); }
   else {
@@ -701,7 +684,7 @@ function updateHint(sec) {
   document.getElementById(sec+'ColorHint').textContent = rule.hint;
   const addBtn = document.getElementById(sec+'AddBtn');
   if (!addBtn) return;
-  addBtn.style.display = (S[sec].anim === 'rainbow' || S[sec].colors.length >= rule.max && rule.max > 0) ? 'none' : '';
+  addBtn.style.display = (S[sec].anim === 'rainbow' || (S[sec].colors.length >= rule.max && rule.max > 0)) ? 'none' : '';
 }
 
 function showErr(sec, msg) {
@@ -885,36 +868,40 @@ function darkenHex(hex,amt){let[r,g,b]=hexToRgb(hex);return`rgb(${Math.max(0,Mat
 
 // ══════════════════════════════════════════
 //  LIVE PREVIEW
+//  applyEl — rotate kini pakai rAF loop,
+//  identik dengan Roblox: angle += spd * dt * 30
 // ══════════════════════════════════════════
 function applyEl(elId, sec, spdId) {
   const el = document.getElementById(elId);
   const anim = S[sec].anim;
   const colors = S[sec].colors;
-  const spd = parseFloat(document.getElementById(spdId).value)||1;
+  const spd = parseFloat(document.getElementById(spdId).value) || 1;
+
+  // Bersihkan kelas & style lama
   el.className = el.className.replace(/class-\w+/g,'').trim();
   el.style.cssText = '';
+  stopRotateLoop(elId); // hentikan loop rotate sebelumnya
 
-  // Change 8: static = no animation, just solid color or default
   if (anim === 'static') {
-    if (colors.length > 0) {
-      el.style.color = '#'+colors[0];
-    } else {
-      el.style.color = '#aab0cc';
-    }
+    el.style.color = colors.length > 0 ? '#'+colors[0] : '#aab0cc';
     return;
   }
+
   if (anim === 'rainbow') {
     el.classList.add('class-rainbow');
     el.style.animationDuration = (2/spd).toFixed(2)+'s';
     return;
   }
+
   if (colors.length === 0) { el.style.color='#555'; return; }
-  const col = '#'+colors[0];
+
   if (anim === 'slide') {
     const hexList = colors.map(c=>'#'+c);
     let grad;
     if (hexList.length === 1) {
-      grad = `linear-gradient(90deg,${darkenHex(hexList[0],.5)},${hexList[0]},${lightenHex(hexList[0],.7)},${hexList[0]},${darkenHex(hexList[0],.5)})`;
+      // 1 warna = solid, tidak ada efek putih/lighten
+      el.style.color = hexList[0];
+      return;
     } else {
       const arr = [...hexList, ...hexList.slice().reverse()];
       grad = `linear-gradient(90deg,${arr.map((c,i)=>`${c} ${Math.round(i/(arr.length-1)*100)}%`).join(',')})`;
@@ -926,16 +913,15 @@ function applyEl(elId, sec, spdId) {
     el.style.webkitTextFillColor = 'transparent';
     el.classList.add('class-slide');
     el.style.animationDuration = (3/spd).toFixed(2)+'s';
-  } else if (anim === 'rotate') {
-    const hexList = colors.map(c=>'#'+c);
-    const cyc = [...hexList, hexList[0]];
-    el.style.background = `linear-gradient(135deg,${cyc.map((c,i)=>`${c} ${Math.round(i/(cyc.length-1)*100)}%`).join(',')})`;
-    el.style.backgroundSize = '400% 400%';
-    el.style.webkitBackgroundClip = 'text';
-    el.style.backgroundClip = 'text';
-    el.style.webkitTextFillColor = 'transparent';
+    return;
+  }
+
+  if (anim === 'rotate') {
+    // Tandai elemen dengan class-rotate, lalu jalankan rAF loop
     el.classList.add('class-rotate');
-    el.style.animationDuration = (4/spd).toFixed(2)+'s';
+    const hexList = colors.map(c=>'#'+c);
+    startRotateLoop(elId, hexList, spd);
+    return;
   }
 }
 
@@ -960,7 +946,6 @@ function doReset() {
     S[sec].anim = 'static'; S[sec].colors = [];
     document.getElementById(sec+'AnimGrid').querySelectorAll('.abtn').forEach((b,i)=>b.classList.toggle('on',i===0));
     document.getElementById(sec+'ColorWrap').classList.remove('hidden');
-    // Change 8: hide speed row on reset (static)
     document.getElementById(sec+'SpdRow').classList.add('hidden');
     renderColorTags(sec);
   });
@@ -968,6 +953,8 @@ function doReset() {
   ['roleSpd','rankSpd'].forEach(id=>document.getElementById(id).value=1);
   document.getElementById('roleSpdV').textContent='1.0x';
   document.getElementById('rankSpdV').textContent='1.0x';
+  stopRotateLoop('pr');
+  stopRotateLoop('pk');
   saveSession();
   liveUpdate();
   toast('🔄','Reset to default');
@@ -985,13 +972,11 @@ function generateFormat() {
   const usn = S.player.user;
   const role = document.getElementById('roleName').value || '—';
   const rank = document.getElementById('rankName').value || '—';
-
   let colorLines = '';
   const rColors = S.role.colors;
   const kColors = S.rank.colors;
   const rAnim = S.role.anim;
   const kAnim = S.rank.anim;
-
   if (rAnim === 'rainbow') {
     colorLines += `Role  : 🌈 Rainbow\n`;
   } else if (rColors.length > 0) {
@@ -1003,7 +988,6 @@ function generateFormat() {
     colorLines += `Rank  : ${kColors.map(c=>'#'+c).join(', ')} (${kAnim})\n`;
   }
   if (!colorLines) colorLines = '(belum ada warna dipilih)';
-
   const fmt = `usn : ${usn}
 atas : ${role}
 bawah : ${rank}
@@ -1012,7 +996,6 @@ ${colorLines}
 ——————————————————
 Atlas Club Title Request
 Preview by: Title Editor Pro`;
-
   document.getElementById('fmtBox').textContent = fmt;
   showModal('fmtModal');
 }
@@ -1063,17 +1046,11 @@ function restoreAnimUI(sec, mode) {
   const modeMap = { static:0, slide:1, rotate:2, rainbow:3 };
   grid.querySelectorAll('.abtn').forEach((b,i) => b.classList.toggle('on', i === (modeMap[mode]??0)));
   const spdRow = document.getElementById(sec+'SpdRow');
-  if (mode === 'static') {
-    spdRow.classList.add('hidden');
-  } else {
-    spdRow.classList.remove('hidden');
-  }
+  if (mode === 'static') { spdRow.classList.add('hidden'); }
+  else { spdRow.classList.remove('hidden'); }
   const wrap = document.getElementById(sec+'ColorWrap');
-  if (mode === 'rainbow') {
-    wrap.classList.add('hidden');
-  } else {
-    wrap.classList.remove('hidden');
-  }
+  if (mode === 'rainbow') { wrap.classList.add('hidden'); }
+  else { wrap.classList.remove('hidden'); }
   updateHint(sec);
 }
 
@@ -1086,57 +1063,36 @@ function switchTab(tab) {
   const tP = document.getElementById('tabPlayers');
   const tE = document.getElementById('tabEditor');
   if (tab === 'players') {
-    left.classList.add('mob-show');
-    right.classList.remove('mob-show');
-    tP.classList.add('active');
-    tE.classList.remove('active');
+    left.classList.add('mob-show'); right.classList.remove('mob-show');
+    tP.classList.add('active'); tE.classList.remove('active');
   } else {
-    right.classList.add('mob-show');
-    left.classList.remove('mob-show');
-    tE.classList.add('active');
-    tP.classList.remove('active');
+    right.classList.add('mob-show'); left.classList.remove('mob-show');
+    tE.classList.add('active'); tP.classList.remove('active');
   }
 }
 
 // ══════════════════════════════════════════
-//  INIT — restore session if available
+//  INIT
 // ══════════════════════════════════════════
 function init() {
   const saved = loadSession();
   if (saved) {
-    // restore custom users
-    if (saved.customUsers && saved.customUsers.length > 0) {
-      customUsers = saved.customUsers;
-    }
+    if (saved.customUsers && saved.customUsers.length > 0) customUsers = saved.customUsers;
     renderList();
-
-    // restore role/rank state
     ['role','rank'].forEach(sec => {
       if (saved[sec]) {
         S[sec].anim = saved[sec].anim || 'static';
         S[sec].colors = saved[sec].colors || [];
       }
     });
-
-    // restore inputs
     if (saved.roleName) document.getElementById('roleName').value = saved.roleName;
     if (saved.rankName) document.getElementById('rankName').value = saved.rankName;
-    if (saved.roleSpd) {
-      document.getElementById('roleSpd').value = saved.roleSpd;
-      document.getElementById('roleSpdV').textContent = parseFloat(saved.roleSpd).toFixed(1)+'x';
-    }
-    if (saved.rankSpd) {
-      document.getElementById('rankSpd').value = saved.rankSpd;
-      document.getElementById('rankSpdV').textContent = parseFloat(saved.rankSpd).toFixed(1)+'x';
-    }
-
-    // restore anim UI
+    if (saved.roleSpd) { document.getElementById('roleSpd').value = saved.roleSpd; document.getElementById('roleSpdV').textContent = parseFloat(saved.roleSpd).toFixed(1)+'x'; }
+    if (saved.rankSpd) { document.getElementById('rankSpd').value = saved.rankSpd; document.getElementById('rankSpdV').textContent = parseFloat(saved.rankSpd).toFixed(1)+'x'; }
     restoreAnimUI('role', S.role.anim);
     restoreAnimUI('rank', S.rank.anim);
     renderColorTags('role');
     renderColorTags('rank');
-
-    // restore selected player
     if (saved.playerId) {
       const custom = customUsers.find(p => p.id === saved.playerId);
       if (custom) {
@@ -1150,32 +1106,22 @@ function init() {
     renderList();
     ['role','rank'].forEach(sec => {
       updateHint(sec);
-      // Change 8: hide speed initially since default is static
       document.getElementById(sec+'SpdRow').classList.add('hidden');
     });
   }
-
   liveUpdate();
 }
 
 init();
 
 // ══════════════════════════════════════════
-//  PREVENT ZOOM (PC + Mobile)
+//  PREVENT ZOOM
 // ══════════════════════════════════════════
-document.addEventListener('wheel', function(e) {
-  if (e.ctrlKey) e.preventDefault();
-}, { passive: false });
-
-document.addEventListener('keydown', function(e) {
-  if (e.ctrlKey && (e.key==='+' || e.key==='-' || e.key==='=' || e.key==='0' || e.key==='_')) {
-    e.preventDefault();
-  }
-});
-
-document.addEventListener('gesturestart', function(e) { e.preventDefault(); }, { passive: false });
-document.addEventListener('gesturechange', function(e) { e.preventDefault(); }, { passive: false });
-document.addEventListener('gestureend', function(e) { e.preventDefault(); }, { passive: false });
+document.addEventListener('wheel', e => { if(e.ctrlKey) e.preventDefault(); }, {passive:false});
+document.addEventListener('keydown', e => { if(e.ctrlKey && (e.key==='+' || e.key==='-' || e.key==='=' || e.key==='0' || e.key==='_')) e.preventDefault(); });
+document.addEventListener('gesturestart', e => e.preventDefault(), {passive:false});
+document.addEventListener('gesturechange', e => e.preventDefault(), {passive:false});
+document.addEventListener('gestureend', e => e.preventDefault(), {passive:false});
 </script>
 </body>
 </html>
